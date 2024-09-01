@@ -1,22 +1,40 @@
-import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Octicons } from '@expo/vector-icons';
 import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import React from 'react';
+import { Platform, Pressable } from 'react-native';
 
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+import { useColorScheme } from '@/components/useColorScheme';
+import { useRepoCount } from '@/components/useRepoCount';
+import Colors from '@/constants/Colors';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+function TabBarIcon(
+  props: Readonly<{
+    name: React.ComponentProps<typeof Octicons>['name'];
+    color: string;
+  }>
+) {
+  return <Octicons size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { count } = useRepoCount();
+
+  const TabTwoStyle: Parameters<typeof Tabs.Screen>[0]['options'] = count
+    ? {
+        tabBarBadge: count < 99 ? count : '+99',
+        tabBarBadgeStyle: {
+          maxWidth: 40,
+        },
+        ...(Platform.OS === 'web' && {
+          tabBarIconStyle: {
+            marginRight: count > 99 ? 20 : 10,
+          },
+        }),
+      }
+    : {};
 
   return (
     <Tabs
@@ -25,18 +43,19 @@ export default function TabLayout() {
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
-      }}>
+      }}
+    >
       <Tabs.Screen
-        name="index"
+        name='index'
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Perfil',
+          tabBarIcon: ({ color }) => <TabBarIcon name='book' color={color} />,
           headerRight: () => (
-            <Link href="/modal" asChild>
+            <Link href='/modal' asChild>
               <Pressable>
                 {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
+                  <Octicons
+                    name='search'
                     size={25}
                     color={Colors[colorScheme ?? 'light'].text}
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
@@ -48,10 +67,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="two"
+        name='two'
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Repositórios',
+          tabBarIcon: ({ color }) => <TabBarIcon name='repo' color={color} />,
+          ...TabTwoStyle,
         }}
       />
     </Tabs>

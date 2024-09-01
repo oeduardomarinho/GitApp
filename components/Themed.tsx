@@ -3,9 +3,16 @@
  * https://docs.expo.io/guides/color-schemes/
  */
 
-import { Text as DefaultText, View as DefaultView } from 'react-native';
+import { MaterialCommunityIcons as DefaultMaterialCommunityIcons } from '@expo/vector-icons';
+import { ComponentProps } from 'react';
+import { View as DefaultView } from 'react-native';
+import {
+  Searchbar as DefaultSearchbar,
+  Text as DefaultText,
+} from 'react-native-paper';
 
 import Colors from '@/constants/Colors';
+
 import { useColorScheme } from './useColorScheme';
 
 type ThemeProps = {
@@ -13,8 +20,12 @@ type ThemeProps = {
   darkColor?: string;
 };
 
-export type TextProps = ThemeProps & DefaultText['props'];
+export type TextProps = ThemeProps & ComponentProps<typeof DefaultText>;
 export type ViewProps = ThemeProps & DefaultView['props'];
+export type SearchbarProps = ThemeProps &
+  ComponentProps<typeof DefaultSearchbar>;
+export type MaterialCommunityIconsProps = ThemeProps &
+  ComponentProps<typeof DefaultMaterialCommunityIcons>;
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
@@ -39,7 +50,31 @@ export function Text(props: TextProps) {
 
 export function View(props: ViewProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
-  const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
+  const backgroundColor = useThemeColor(
+    { light: lightColor, dark: darkColor },
+    'background'
+  );
 
   return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
+}
+
+export function Searchbar(props: SearchbarProps) {
+  const { style, lightColor, darkColor, ...otherProps } = props;
+  const backgroundColor = useThemeColor(
+    { light: lightColor, dark: darkColor },
+    'background'
+  );
+  const tintColor = useThemeColor(
+    { light: lightColor, dark: darkColor },
+    'tint'
+  );
+
+  return (
+    <DefaultSearchbar
+      style={[{ backgroundColor }, style]}
+      iconColor={tintColor}
+      elevation={1}
+      {...otherProps}
+    />
+  );
 }
